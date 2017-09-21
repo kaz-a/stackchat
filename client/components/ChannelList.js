@@ -48,7 +48,7 @@ export default class ChannelList extends Component {
             <span className="badge">
             {
               messages.filter(message => {
-                return message.channelId === 1
+                return message.channelId === 2
               }).length
             }
             </span>
@@ -60,7 +60,7 @@ export default class ChannelList extends Component {
             <span className="badge">
             {
               messages.filter(message => {
-                return message.channelId === 1
+                return message.channelId === 3
               }).length
             }
             </span>
@@ -72,7 +72,7 @@ export default class ChannelList extends Component {
             <span className="badge">
             {
               messages.filter(message => {
-                return message.channelId === 1
+                return message.channelId === 4
               }).length
             }
             </span>

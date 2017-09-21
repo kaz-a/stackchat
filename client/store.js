@@ -8,11 +8,13 @@ import socket from './socket';
 const GOT_MESSAGES_FROM_SERVER = "GOT_MESSAGES_FROM_SERVER";
 const WRITE_MESSAGE = "WRITE_MESSAGE";
 const GOT_NEW_MESSAGE_FROM_SERVER = "GOT_NEW_MESSAGES_FROM_SERVER"
+const CREATE_AUTHOR = "CREATE_AUTHOR";
 
 // initial state
 const initialState = {
 	messages: [], 
-  newMessage: ""
+  newMessage: "",
+  author: ""
 }
 
 
@@ -28,6 +30,8 @@ function reducer(state = initialState, action){
     case GOT_NEW_MESSAGE_FROM_SERVER:
       // avoid mutation by concatenating instead of pushing (because push will push an array into an array)
       return Object.assign({}, state, { messages: state.messages.concat(action.messages) })
+    case CREATE_AUTHOR:
+      return Object.assign({}, state, { author: action.author })
 		default:
 			return state;
 	}
@@ -51,7 +55,14 @@ export const writeMessage = (newMsg) => {
 export const gotNewMessageFromServer = (arrayMsg) => {
   return {
     type: GOT_NEW_MESSAGE_FROM_SERVER,
-    messages: arrayMsg
+    messages: arrayMsg, 
+  }
+}
+
+export const createAuthor = (authorName) => {
+  return {
+    type: CREATE_AUTHOR,
+    author: authorName
   }
 }
 
@@ -68,6 +79,7 @@ export const fetchMessages = () => {
 
   }
 }
+
 export function postMessage (message) {
   return function thunk (dispatch) {
     return axios.post('/api/messages', message)
