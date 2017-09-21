@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import Message from './Message';
 import NewMessageEntry from './NewMessageEntry';
 import axios from 'axios';
-import store, { gotMessagesFromServer } from '../store';
+import store, { gotMessagesFromServer, fetchMessages } from '../store';
+
 
 export default class MessagesList extends Component {
 
@@ -14,13 +15,15 @@ export default class MessagesList extends Component {
   // "If I DID mount to you, let's call an ajax request
   //  and subscribe to the store for state changes"
   componentDidMount () {
-    axios.get('/api/messages')
-      .then(res => res.data)
-      .then(messages => {
-        const action = gotMessagesFromServer(messages)
-        store.dispatch(action)
-      })
-
+    // // this block is moved to store.js fetchMessages functin
+    // axios.get('/api/messages')
+    //   .then(res => res.data)
+    //   .then(messages => {
+    //     const action = gotMessagesFromServer(messages)
+    //     store.dispatch(action)
+    //   })
+    const thunkAction = fetchMessages();
+    store.dispatch(thunkAction);
 
     // When we use store.subscribe, it returns an "unsubscribe" function 
     // that we can use to remove the listener. 
@@ -45,8 +48,18 @@ export default class MessagesList extends Component {
         <ul className="media-list">
           { filteredMessages.map(message => <Message message={message} key={message.id} />) }
         </ul>
-        <NewMessageEntry />
+        <NewMessageEntry channelId={ channelId }/>
       </div>
     );
   }
 }
+
+
+
+
+
+
+
+
+
+

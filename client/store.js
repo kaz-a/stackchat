@@ -1,4 +1,8 @@
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import loggerMiddleware from 'redux-logger';
+import thunkMiddleware from 'redux-thunk';
+import axios from 'axios';
+import socket from './socket';
 
 // action types
 const GOT_MESSAGES_FROM_SERVER = "GOT_MESSAGES_FROM_SERVER";
@@ -17,7 +21,7 @@ const initialState = {
 function reducer(state = initialState, action){
 	switch (action.type){ // if the action's type is ..., 
 		case GOT_MESSAGES_FROM_SERVER:
-      // assign to an empty {} with old state and action item
+      // assign to an empty {} an old state and action item
 			return Object.assign({}, state,  { messages: action.messages })
     case WRITE_MESSAGE:
       return Object.assign({}, state, { newMessage: action.newMessage})
@@ -51,8 +55,45 @@ export const gotNewMessageFromServer = (arrayMsg) => {
   }
 }
 
+// action creator (thunk creator) for ajax requests
+export const fetchMessages = () => {
+  return function thunk(dispatch){
+    return axios.get('/api/messages')
+      .then(res => res.data)
+      .then(messages => {
+        // console.log(messages)
+        const action = gotMessagesFromServer(messages)
+        dispatch(action)
+      })
+
+  }
+}
+export function postMessage (message) {
+  return function thunk (dispatch) {
+    return axios.post('/api/messages', message)
+      .then(res => res.data)
+      .then(newMessage => {
+        const action = getMessage(newMessage);
+        dispatch(action);
+        socket.emit('new-message', newMessage);
+      });
+  }
+}
+
+export const postNewMessage = (message) => {
+  return function thunk(dispatch){
+    return axios.post("/api/messages", message)
+    .then(res => res.data)
+    .then(newMessage => {
+      const action = gotNewMessageFromServer(newMessage);
+      dispatch(action);
+      socket.emit('new-message', newMessage);
+    })
+  }
+}
+
 // store
-const store = createStore(reducer);
+const store = createStore(reducer, applyMiddleware(loggerMiddleware, thunkMiddleware));
 export default store;
 
 
